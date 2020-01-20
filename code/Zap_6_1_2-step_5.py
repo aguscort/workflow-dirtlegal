@@ -1,7 +1,6 @@
 import json
 import requests
-import re, random
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 # PARAMETERS 

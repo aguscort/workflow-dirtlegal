@@ -1,5 +1,4 @@
 import re
-from datetime import datetime, timedelta
 
 # PARAMETERS 
 input_data = { 'order_id':	'',
