@@ -115,9 +115,8 @@ def exhaustive_search(path):
     list_folder = entries
     while has_more:
         entries, cursor, has_more = get_folders(path, cursor)
-        list_folder.extend(entries)
-    else:
-        return list_folder
+        list_folder.extend(entries)        
+    return list_folder
 
 def exhaustive_customer_search():
     customers = []
@@ -126,8 +125,7 @@ def exhaustive_customer_search():
     while page <= pages:         
         t_customers, total, page, pages = get_customers(page+1)
         customers.extend(t_customers)
-    else:
-        return customers
+    return customers
     
 datetoday, date_lastweek, datetoday_lastmonth = date_treatment()
 is_Order = False
