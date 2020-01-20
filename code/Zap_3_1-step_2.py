@@ -2,6 +2,24 @@ import json
 import requests
 import re
 
+# PARAMETERS 
+input_data = { 'city':	'',
+    'Apartment':	'',
+    'name' : '',
+    'webhook_apex' : '',
+    'tr_param': '',
+    'webhook':	'',
+    'phone':	'',
+    'state':	'',
+    'street':	'',
+    'itemList':	'',
+    'td_quantity_param':	'',
+    'postalcode':'',
+    'quantity': '',
+    'order': '',
+    'td_name_param': '' }
+# /PARAMETERS 
+
 def GetStorage(access_token):
     url = 'https://store.zapier.com/api/records?secret=' + access_token
     return requests.get(url).json()
@@ -19,9 +37,9 @@ def sendMail(sku, itens, orderid, supplier, supplier_to, name, street, city, sta
 def getItems(offset = None):
     req = ''
     if offset:
-        req = requests.get('https://api.airtable.com/v0/appFufkqfl9yZNU5b/Email%20Automation', headers={"Authorization":"Bearer keyYk3nnO04dbLGaT"}, params={"offset":offset}).json()
+        req = requests.get('https://api.airtable.com/v0/appFufkqfl9yZNU5b/SKU%20List', headers={"Authorization":"Bearer keyYk3nnO04dbLGaT"}, params={"offset":offset}).json()
     else:
-        req = requests.get('https://api.airtable.com/v0/appFufkqfl9yZNU5b/Email%20Automation', headers={"Authorization":"Bearer keyYk3nnO04dbLGaT"},).json()
+        req = requests.get('https://api.airtable.com/v0/appFufkqfl9yZNU5b/SKU%20List', headers={"Authorization":"Bearer keyYk3nnO04dbLGaT"},).json()
     try:
         if req['offset']:
             return req['records'], req['offset']

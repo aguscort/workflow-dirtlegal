@@ -3,6 +3,17 @@ import requests
 import re, random
 from datetime import datetime, timedelta
 
+
+# PARAMETERS 
+input_data = { 'item_name':	'',
+    'wo':	'',
+    'text' : '',
+    'name' : '',
+    'sku': '',
+    'apikey_shipstation':	'',
+    'password_shipstation' : '' }
+# /PARAMETERS 
+
 def date_today():
     # Date treatment
     datetoday = datetime.utcnow() #- timedelta(hours=8)
@@ -39,7 +50,13 @@ def create_ut_title_app(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_mo
     url = 'https://hooks.zapier.com/hooks/catch/4834230/o635mrg/'
     print("ut_title_app")
     data = { "pdf_vehicle_owner" : pdf_vehicle_owner,  "pdf_vin" : pdf_vin, "pdf_year" : pdf_year, "pdf_make" : pdf_make, "pdf_model" : pdf_model, "pdf_vehicle_adress" : pdf_vehicle_adress, "pdf_vehicle_adress2" : pdf_vehicle_adress2, "pdf_city" : pdf_city , "pdf_state" : pdf_state , "pdf_zip" : pdf_zip , "pdf_color" : pdf_color,  "pdf_mileage": pdf_mileage, "pdf_ccs" : pdf_ccs, "wo" : wo , "name" : name  }
-    return requests.post(url, data=json.dumps(data),)  
+    return requests.post(url, data=json.dumps(data),)
+
+def create_sd_lien_cover_sheet(tr_lien_holder_name, tr_vehicle_year, tr_vehicle_make,  tr_vehicle_model, tr_vehicle_serial, tr_vehicle_owner, tr_account, wo):
+    url = 'https://hooks.zapier.com/hooks/catch/4834230/o6wlqor/'
+    print("sd_lien_cover")
+    data = { "tr_lien_holder_name" : tr_lien_holder_name, "vehicle" : tr_vehicle_year + " " + tr_vehicle_make + " " + tr_vehicle_model, "tr_vehicle_serial" : tr_vehicle_serial, "tr_vehicle_owner" : tr_vehicle_owner, "tr_account" : tr_account, "wo" : wo}
+    return requests.post(url, data=json.dumps(data),)
 
 #
 # Get Data
@@ -72,6 +89,10 @@ try:
     tr_vehicle_make =  text_list[5].split(":")[1]   
 except:    
     tr_vehicle_make =  ""
+try:
+    tr_vehicle_model =  text_list[6].split(":")[1] 
+except:    
+    tr_vehicle_model = ""    
 tr_day, tr_month, tr_year = date_today()
 tr_account = text_list[16].split(":")[1].strip()
 try:
@@ -146,19 +167,21 @@ else:
 # Send Autofilled PDF
 s1_title_request_pdf_asana = ["SQ5997142","SQ9575974","SQ4359210","SQ6193077","SQ3509691","SQ7202884","SQ9493879","SQ1624128","SQ9857937","SQ9579630","SQ6283166","SQ8910742"]
 s1_ut_vin_inspection_pdf_asana = ["SQ5548002","SQ2127240"]
-s1_vt_inspection_form_with_letterhead_pdf_asana = ["SQ8811460","SQ8403421","SQ1235346","SQ0550038","SQ0910340","SQ0559800","SQ3553182","SQ0355699","SQ2127240"]
-s2_vt_title_app = ["SQ8811460","SQ8403421","SQ1235346","SQ0550038","SQ0910340","SQ0559800","SQ3553182","SQ0355699"]
+s1_vt_inspection_form_with_letterhead_pdf_asana = ["SQ8811460","SQ8403421","SQ1235346","SQ0550038","SQ0910340","SQ0559800","SQ3553182","SQ0355699","SQ0038404","SQ9197192","SQ2127240"]
+s2_vt_title_app = ["SQ8811460","SQ8403421","SQ1235346","SQ0550038","SQ0910340","SQ0559800","SQ3553182","SQ0355699","SQ0038404","SQ9197192","SQ0495127"]
 s2_vt_title_app_for_ut_transfer = ["SQ2127240"]
 s2_ut_title_app = ["SQ5548002","SQ2127240"]
-
+s2_sd_lien_cover_sheet = ["SQ5997142", "SQ9575974", "SQ4359210", "SQ6193077", "SQ3509691", "SQ7202884", "SQ9493879", "SQ1624128", "SQ9857937", "SQ9579630", "SQ6283166", "SQ8910742"]
 
 if input_data['sku'] in s1_title_request_pdf_asana:
     create_title_request(tr_lien_holder_name, tr_lien_holder_addres_1, tr_lien_holder_address_2, tr_day, tr_month, tr_year, tr_vehicle_year, tr_vehicle_make, tr_vehicle_serial, tr_vehicle_owner, tr_vehicle_adress, tr_vehicle_adress2, tr_account, input_data["wo"])  
 
 if input_data['sku'] in s1_ut_vin_inspection_pdf_asana:     
     create_ut_vin_inspection(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, input_data["wo"])
-    create_vt_inspection_form_with_letterhead(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, pdf_mileage, input_data["wo"])
 
+if input_data['sku'] in s1_vt_inspection_form_with_letterhead_pdf_asana:     
+    create_vt_inspection_form_with_letterhead(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, pdf_mileage, input_data["wo"])       
+    
 if input_data['sku'] in s2_vt_title_app:
     create_vt_title_app(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, pdf_city , pdf_state , pdf_zip , pdf_color, pdf_mileage, pdf_ccs, input_data["wo"], input_data["name"],  pdf_body_type, pdf_wheels)
 
@@ -167,3 +190,6 @@ if input_data['sku'] in s2_vt_title_app_for_ut_transfer:
 
 if input_data['sku'] in s2_ut_title_app:
     create_ut_title_app(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, pdf_city , pdf_state , pdf_zip , pdf_color, pdf_mileage, pdf_ccs, input_data["wo"], input_data["name"]) 
+
+if input_data['sku'] in s2_sd_lien_cover_sheet:
+    create_sd_lien_cover_sheet(tr_lien_holder_name, tr_vehicle_year, tr_vehicle_make,  tr_vehicle_model, tr_vehicle_serial, tr_vehicle_owner, tr_account, input_data["wo"])

@@ -1,15 +1,51 @@
 import re
 from datetime import datetime, timedelta
 
+# PARAMETERS 
+input_data = { 'order_id':	'',
+    'item':	'',
+    'ItemQuantity' : '',
+    'matchs' : 'Dirt Bike Conversion, ATV Conversion, UTV Conversion, Roxor Conversion, Military Conversion, Custom Street Legal Conversion, Golf Cart Conversion,Vehicle Registration Renewal',
+    'paymentMethod': '',
+    'ship_to_name':	'',
+    'order_total':	'',
+    'orderDate':	'',
+    'itemSKU':	'',
+    'customer_email':	'',
+    'OrderRaw':	'',
+    'items':'',
+    'createDate': '',
+    'fulfillmentSku': '',
+    'imageUrl': '',
+    'lineItemKey': '',
+    'modifyDate': '',
+    'name': '',
+    'options': '',
+    'orderItemId': '',
+    'productId':'',
+    'quantity': '',
+    'shippingAmount': '',
+    'sku': '',
+    'taxAmount': '',
+    'unitPrice': '',
+    'upc': '',
+    'warehouseLocation': '',
+    'weight': '',
+    'access_token':	'',
+    'ship_to_phone': '',
+    'asana_webhook': '' }
+# /PARAMETERS 
+
+
 def CreateAsana(ship_to_name, order, customer_email, ship_to_phone, order_total, item_name, date, pdfs_to_apply, title_request):
-    req = requests.get('https://hooks.zapier.com/hooks/catch/4834230/ouvjsol/',params={"ship_to_name" : ship_to_name, "order" : order, "customer_email" : customer_email, "ship_to_phone" : ship_to_phone, "order_total" : order_total, "item_name" : item_name, "date" : date, "pdfs_to_apply" : pdfs_to_apply, "title_request" : title_request})
+    req = requests.get('https://hooks.zapier.com/hooks/catch/4834230/otl7ydt/',params={"ship_to_name" : ship_to_name, "order" : order, "customer_email" : customer_email, "ship_to_phone" : ship_to_phone, "order_total" : order_total, "item_name" : item_name, "date" : date, "pdfs_to_apply" : pdfs_to_apply, "title_request" : title_request})
     
 def Create_asana_renewal(ship_to_name, order, customer_email, ship_to_phone, order_total, item_name, date, asana_renewal_status, pdfs_to_apply, title_request):
     req = requests.get('https://hooks.zapier.com/hooks/catch/4834230/ouqdrzi/',params={"ship_to_name" : ship_to_name, "order" : order, "customer_email" : customer_email, "ship_to_phone" : ship_to_phone, "order_total" : order_total, "item_name" : item_name, "date" : date, "asana_renewal_status" : asana_renewal_status, "pdfs_to_apply" : pdfs_to_apply, "title_request" : title_request})
 
     
-def create_asana_task_for_product(ship_to_name, order, customer_email, ship_to_phone, order_total, date, items, order_id):
-    req = requests.get('https://hooks.zapier.com/hooks/catch/4834230/otoh0ip/',params={"ship_to_name" : ship_to_name, "order" : order, "customer_email" : customer_email, "ship_to_phone" : ship_to_phone, "order_total" : order_total, "date" : date, "items" : items, "order_id" : order_id})    
+def create_asana_task_for_product(ship_to_name, order, customer_email, ship_to_phone, order_total, date, items, order_id, order_id_raw):
+    req = requests.get('https://hooks.zapier.com/hooks/catch/4834230/otskw5d/',params={"ship_to_name" : ship_to_name, "order" : order, "customer_email" : customer_email, "ship_to_phone" : ship_to_phone, "order_total" : order_total, "date" : date, "items" : items, "order_id" : order_id, "order_id_raw" : order_id_raw })    
     
 def date_treatment(datetimeStr):
     # Date treatment, change formatting and set timezone
@@ -32,7 +68,7 @@ source = ''
 if len(input_data['OrderRaw']) == 3:
     order = 'E' + input_data['OrderRaw']
     source = 'Ebay (Paypal)'
-elif len(input_data['OrderRaw']) == 4:  
+elif len(input_data['OrderRaw']) == 4:
     order = input_data['OrderRaw']
     #source = 'Stripe'
 else:
@@ -108,26 +144,29 @@ for i in range(len(s1_title_request_pdf_asana)):
 #
 # Choosing the PDFS
 #    
-s1_instruction_pdf_asana = [['(1) SD_Lien_Instructions.pdf' , ['SQ5997142', 'SQ9575974', 'SQ4359210', 'SQ6193077', 'SQ3509691', 'SQ7202884', 'SQ9493879', 'SQ1624128', 'SQ9857937', 'SQ9579630', 'SQ6283166', 'SQ8910742']], \
-['(1) SD_MCO_Instructions.pdf' , ['SQ6671046','SQ4635264','SQ5166965','SQ2649829','SQ4922562','SQ4808996','SQ8069412','SQ5023998']], \
-['(1) SD_Title_Instructions.pdf' , ['SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
-['(1) UT_Only_Instructions.pdf' , ['SQ5548002']], \
-['(1) UT_VT_To_UT_Instructions.pdf' , ['SQ2127240']], \
-['(1) VT_Instructions.pdf', ['Q8811460', 'SQ8403421','SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699']]]
-s1_checklist_pdf_asana = [['(1) CL_SD_Lien_Tax.pdf', ['SQ5997142', 'SQ9575974', 'SQ4359210', 'SQ6193077',  'SQ3509691', 'SQ7202884','SQ9493879', 'SQ1624128','SQ9857937', 'SQ9579630', 'SQ6283166', 'SQ8910742']], \
-['(1) CL_SD_Lien.pdf', ['SQ5997142', 'SQ9575974', 'SQ4359210', 'SQ6193077',  'SQ3509691', 'SQ7202884','SQ9493879', 'SQ1624128','SQ9857937', 'SQ9579630', 'SQ6283166', 'SQ8910742']], \
-['(1) CL_SD_MCO_or_Title_in_Name_Tax.pdf', ['SQ6671046', 'SQ4635264', 'SQ5166965', 'SQ2649829', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998','SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
-['(1) CL_SD_MCO.pdf', ['SQ6671046', 'SQ4635264', 'SQ5166965', 'SQ2649829', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998','SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
-['(1) CL_SD_Title_in_Name.pdf', ['SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
-['(1) CL_SD_Title_Signed_Over_Tax.pdf', ['SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
-['(1) CL_UT_Only_Tax.pdf', ['SQ5548002']], \
-['(1) CL_UT_Only.pdf', ['SQ5548002']] , \
-['(1) CL_VT_BOS_VIN_Inspection.pdf', ['SQ8811460', 'SQ8403421', 'SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699']],  \
-['(1) CL_VT_BOS.pdf', ['SQ8811460', 'SQ8403421', 'SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699']],  \
-['(1) CL_VT_MCO_Tax.pdf', ['SQ8811460', 'SQ8403421', 'SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699']], \
-['(1) CL_VT_TO_UT_BOS_BIZ_TAX.pdf', ['SQ2127240']], \
-['(1) CL_VT_TO_UT_BOS_BIZ.pdf', ['SQ2127240']], \
-['(1) CL_VT_TO_UT_BOS.pdf', ['SQ2127240']]]  
+s1_instruction_pdf_asana = [['(1) SD Lien Instructions.pdf' , ['SQ5997142', 'SQ9575974', 'SQ4359210', 'SQ6193077', 'SQ3509691', 'SQ7202884', 'SQ9493879', 'SQ1624128', 'SQ9857937', 'SQ9579630', 'SQ6283166', 'SQ8910742']], \
+['(1) SD MCO Instructions.pdf' , ['SQ6671046','SQ4635264','SQ5166965','SQ2649829','SQ4922562','SQ4808996','SQ8069412','SQ5023998']], \
+['(1) SD Title Instructions.pdf' , ['SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
+['(1) UT Only Instructions.pdf' , ['SQ5548002']], \
+['(1) UT VT To UT Instructions.pdf' , ['SQ2127240']], \
+['(1) VT Instructions.pdf', ['SQ8811460', 'SQ8403421','SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699','SQ0038404','SQ9197192', 'SQ0495127']]]
+s1_checklist_pdf_asana = [['(1) CL SD Lien Tax.pdf', ['SQ5997142', 'SQ9575974', 'SQ4359210', 'SQ6193077',  'SQ3509691', 'SQ7202884','SQ9493879', 'SQ1624128','SQ9857937', 'SQ9579630', 'SQ6283166', 'SQ8910742']], \
+['(1) CL SD Lien.pdf', ['SQ5997142', 'SQ9575974', 'SQ4359210', 'SQ6193077',  'SQ3509691', 'SQ7202884','SQ9493879', 'SQ1624128','SQ9857937', 'SQ9579630', 'SQ6283166', 'SQ8910742']], \
+['(1) CL SD MCO or Title in Name Tax.pdf', ['SQ6671046', 'SQ4635264', 'SQ5166965', 'SQ2649829', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998','SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
+['(1) CL SD MCO.pdf', ['SQ6671046', 'SQ4635264', 'SQ5166965', 'SQ2649829', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998','SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
+['(1) CL SD Title in Name.pdf', ['SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
+['(1) CL SD Title Signed Over Tax.pdf', ['SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
+['(1) CL UT Only Tax.pdf', ['SQ5548002']], \
+['(1) CL UT Only.pdf', ['SQ5548002']] , \
+['(1) CL VT BOS VIN Inspection.pdf', ['SQ8811460', 'SQ8403421', 'SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699','SQ0038404','SQ9197192']],  \
+['(1) CL VT BOS.pdf', ['SQ8811460', 'SQ8403421', 'SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699','SQ0038404','SQ9197192']],  \
+['(1) CL VT MCO Tax.pdf', ['SQ8811460', 'SQ8403421', 'SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699','SQ0038404','SQ9197192']], \
+['(1) CL VT TO UT BOS BIZ TAX.pdf', ['SQ2127240']], \
+['(1) CL VT MCO.pdf', ['SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182']], \
+['(1) CL VT TO UT BOS BIZ.pdf', ['SQ2127240']], \
+['(1) CL VT TITLE SF97.pdf', ['SQ0495127']], \
+['(1) CL VT TITLE SF97 TAX.pdf', ['SQ0495127']], \
+['(1) CL VT TO UT BOS.pdf', ['SQ2127240']]]   
 pdfs_to_apply = []
 
 for i in range(len(s1_instruction_pdf_asana)):
@@ -175,18 +214,25 @@ for item2 in itemList:
                     asana_renewal_status = "1146228767964637"
                     break
 
-if create_task and not asana_renewal:
-    CreateAsana(input_data['ship_to_name'] , order, input_data['customer_email'], input_data['ship_to_phone'], input_data['order_total'], ','.join(items_name), date_long, pdfs_to_apply, title_request)
+try:
+    if create_task and not asana_renewal:
+        CreateAsana(input_data['ship_to_name'] , order, input_data['customer_email'], input_data['ship_to_phone'], input_data['order_total'], ','.join(items_name), date_long, pdfs_to_apply, title_request)
 
-if create_task and asana_renewal:
-    Create_asana_renewal(input_data['ship_to_name'] , order, input_data['customer_email'], input_data['ship_to_phone'], input_data['order_total'], ','.join(items_name), date_long, asana_renewal_status, pdfs_to_apply, title_request)     
-
+    if create_task and asana_renewal:
+        Create_asana_renewal(input_data['ship_to_name'] , order, input_data['customer_email'], input_data['ship_to_phone'], input_data['order_total'], ','.join(items_name), date_long, asana_renewal_status, pdfs_to_apply, title_request)     
+except:
+    print("Some issue arose")
+    
 #
 # This will apply for ANY order that has an actual product, including combo orders.
 #
-if item != 'Service':
-    # Send info to Asaba
-    create_asana_task_for_product(input_data['ship_to_name'] , order, input_data['customer_email'], input_data['ship_to_phone'], input_data['order_total'], date_long, input_data['items'], input_data['order_id'] )    
+getFirstOrder = re.search(r"^\d\d\d\d-(\d)$", input_data['OrderRaw'])
+try:
+    if item != 'Service' and str(getFirstOrder).find("match") == -1:
+        # Send info to Asana
+        create_asana_task_for_product(input_data['ship_to_name'] , order, input_data['customer_email'], input_data['ship_to_phone'], input_data['order_total'], date_long, input_data['items'], input_data['order_id'], input_data['OrderRaw'] )    
+except:
+    print("Some issue arose")
     
 #
 # Get the Quantities
