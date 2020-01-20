@@ -7,7 +7,7 @@ input_data = { 'text':	'' }
 
 def continue_process(name, text):
     url = 'https://hooks.zapier.com/hooks/catch/4834230/o6wl1yy/'
-    data = {"attempts" : "0", "name" : name,   "text" : input_data['text'], "wo" : "None"}
+    data = {"attempts" : "0", "name" : name,   "text" : text, "wo" : "None"}
     return requests.post(url, data=json.dumps(data),)
 
 #

@@ -30,11 +30,6 @@ def date_treatment():
     datetoday_lastmonth = datetoday_lastmonth.strftime('%Y-%m-%d')
     return datetoday, date_lastweek, datetoday_lastmonth
 
-def get_task_by_id(id):
-    url = 'https://app.asana.com/api/1.0/workspaces/1122730176672819/tasks/search?completed=false'
-    headers = {"Authorization": "Bearer0/b8024a8ee666abda2c08db438001492b"}
-    return requests.get(url, headers=headers,).json()
-
 def continue_process(attempts, name, text, wo):
     url = 'https://hooks.zapier.com/hooks/catch/4834230/o6wl1yy/'
     print("continue_process")
