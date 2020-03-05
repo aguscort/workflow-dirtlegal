@@ -1,46 +1,6 @@
 import re
 from datetime import datetime, timedelta
 
-# PARAMETERS 
-input_data = { 'item':	'',
-    'OrderRaw':	''}
-# /PARAMETERS 
-
-
-def get_order_by_id(id):
-    items = []
-    options =  []
-    url = 'https://ssapi.shipstation.com/orders/' + str(id)
-    req = requests.get(url, auth=(input_data['apikey_shipstation'], input_data['password_shipstation'])).json()
-    for item in req['items']:
-        items.append(item['name'])
-        options_str = ""
-        for option in item['options']:
-            try: 
-                options_str += "- " + option['name'] + ": " + option['value'] + "\r\n"
-            except:
-                options_str += ""
-        options.append(options_str)        
-    return req['shipTo']['street1'] + req['shipTo']['street2'], req['shipTo']['city'] + " " + req['shipTo']['state'] + " " + str(req['shipTo']['postalCode']), str(req['amountPaid']), items, options
-
-def get_all_orders_customer(customerName):
-    url = 'https://ssapi.shipstation.com/orders?customerName=' + str(customerName)  + '&sortBy=OrderDate&sortDir=Desc&pageSize=500'
-    return requests.get(url, auth=(input_data['apikey_shipstation'], input_data['password_shipstation'])).json()
-
-def get_customers(page = 1):
-    url = 'https://ssapi.shipstation.com/customers?page=' + str(page) + '&pageSize=500&SortBy=ModifyDate&sortDir=Asc'        
-    customers, total, page, pages = requests.get(url, auth=(input_data['apikey_shipstation'], input_data['password_shipstation'])).json().values()
-    return customers, total, page, pages
-
-def exhaustive_customer_search():
-    customers = []
-    t_customers, total, page, pages = get_customers()
-    customers.extend(t_customers)
-    while page <= pages:         
-        t_customers, total, page, pages = get_customers(page+1)
-        customers.extend(t_customers)
-    return customers
-
 #
 # Define the Order Type
 #
@@ -102,19 +62,4 @@ else:
     order = input_data['OrderRaw']
     order = re.sub(r'-', '', order)
 
-
-#
-# Get all previous Orders
-#
-customer_orders  = []
-customers = exhaustive_customer_search()
-for customer in customers:
-    if customer['email'].lower() == input.data['email'].lower():
-        name = customer['name']        
-        orders =  get_all_orders_customer(customer['name'])
-        for  order in orders:
-            customer_orders.append([order['orderNumber'], order['items']])
-        break
-
-
-output = [{'customer_orders': customer_orders}]
+output = [{'order': order, "item" : item}]

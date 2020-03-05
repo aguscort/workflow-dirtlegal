@@ -14,8 +14,9 @@ input_data = { 'order': '',
 # /PARAMETERS 
 
 def update_description(gid, text):
-    url = 'https://app.asana.com/api/1.0/tasks/' +  str(gid)  + "?opt_fields=html_notes"
-    headers = {"Content-Type" :"application/json", "Authorization": "Bearer0/b8024a8ee666abda2c08db438001492b"}
+    url = 'https://app.asana.com/api/1.0/tasks/' +  str(gid)  + "?opt_fields=html_notes"   
+    #headers = {"Content-Type" :"application/json", "Authorization": "Bearer0/b8024a8ee666abda2c08db438001492b"}
+    headers = {"Content-Type" :"application/json", "Authorization": "Bearer0/825342430bedc4e0cbcc701c8f59fd96"}    
     data = {"data" : {"html_notes": text }}
     req = requests.put(url, data=json.dumps(data), headers=headers,).json()
     return req

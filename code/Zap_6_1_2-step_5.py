@@ -1,17 +1,18 @@
 import json
 import requests
+import re
 from datetime import datetime
-
 
 # PARAMETERS 
 input_data = { 'item_name':	'',
     'wo':	'',
-    'text' : '',
-    'name' : '',
+    'text':	'',
+    'name':'',
     'sku': '',
-    'apikey_shipstation':	'',
-    'password_shipstation' : '' }
+    'apikey_shipstation': '',
+    'password_shipstation': '' }
 # /PARAMETERS 
+
 
 def date_today():
     # Date treatment
@@ -45,6 +46,12 @@ def create_vt_title_app(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_mo
     data = { "pdf_vehicle_owner" : pdf_vehicle_owner,  "pdf_vin" : pdf_vin, "pdf_year" : pdf_year, "pdf_make" : pdf_make, "pdf_model" : pdf_model, "pdf_vehicle_adress" : pdf_vehicle_adress, "pdf_vehicle_adress2" : pdf_vehicle_adress2, "pdf_city" : pdf_city , "pdf_state" : pdf_state , "pdf_zip" : pdf_zip , "pdf_color" : pdf_color,  "pdf_mileage": pdf_mileage, "pdf_ccs" : pdf_ccs, "wo" : wo , "name" : name, "pdf_body_type" : pdf_body_type, "pdf_wheels" : pdf_wheels  }
     return requests.post(url, data=json.dumps(data),)  
 
+# Added 01/28/2019
+def create_vt_title_app_for_ut_transfer(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, pdf_city , pdf_state , pdf_zip , pdf_color, pdf_mileage, pdf_ccs, wo, name, pdf_body_type, pdf_wheels):
+    url = 'https://hooks.zapier.com/hooks/catch/4834230/ohpc0fe/'
+    print("vt_title_app_for_ut_transfer")
+    data = { "pdf_vehicle_owner" : pdf_vehicle_owner,  "pdf_vin" : pdf_vin, "pdf_year" : pdf_year, "pdf_make" : pdf_make, "pdf_model" : pdf_model, "pdf_vehicle_adress" : pdf_vehicle_adress, "pdf_vehicle_adress2" : pdf_vehicle_adress2, "pdf_city" : pdf_city , "pdf_state" : pdf_state , "pdf_zip" : pdf_zip , "pdf_color" : pdf_color,  "pdf_mileage": pdf_mileage, "pdf_ccs" : pdf_ccs, "wo" : wo , "name" : name, "pdf_body_type" : pdf_body_type, "pdf_wheels" : pdf_wheels  }   
+
 def create_ut_title_app(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, pdf_city , pdf_state , pdf_zip , pdf_color, pdf_mileage, pdf_ccs, wo, name):
     url = 'https://hooks.zapier.com/hooks/catch/4834230/o635mrg/'
     print("ut_title_app")
@@ -57,6 +64,12 @@ def create_sd_lien_cover_sheet(tr_lien_holder_name, tr_vehicle_year, tr_vehicle_
     data = { "tr_lien_holder_name" : tr_lien_holder_name, "vehicle" : tr_vehicle_year + " " + tr_vehicle_make + " " + tr_vehicle_model, "tr_vehicle_serial" : tr_vehicle_serial, "tr_vehicle_owner" : tr_vehicle_owner, "tr_account" : tr_account, "wo" : wo}
     return requests.post(url, data=json.dumps(data),)
 
+def create_sd_automated_forms(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, pdf_city , pdf_state , pdf_zip , pdf_color, pdf_mileage, pdf_ccs, wo, name, pdf_body_type, pdf_wheels):
+    url = 'https://hooks.zapier.com/hooks/catch/4834230/om1r78o/'
+    print("sd_automated_forms")
+    data = { "pdf_vehicle_owner" : pdf_vehicle_owner,  "pdf_vin" : pdf_vin, "pdf_year" : pdf_year, "pdf_make" : pdf_make, "pdf_model" : pdf_model, "pdf_vehicle_adress" : pdf_vehicle_adress, "pdf_vehicle_adress2" : pdf_vehicle_adress2, "pdf_city" : pdf_city , "pdf_state" : pdf_state , "pdf_zip" : pdf_zip , "pdf_color" : pdf_color,  "pdf_mileage": pdf_mileage, "pdf_ccs" : pdf_ccs, "wo" : wo , "name" : name, "pdf_body_type" : pdf_body_type, "pdf_wheels" : pdf_wheels  }
+    return requests.post(url, data=json.dumps(data),)  
+
 #
 # Get Data
 #
@@ -64,6 +77,7 @@ count = 0
 text_list = str(input_data['text']).split("\r\n\r\n")
 name = text_list[0].split(":")[1].strip()
 address = text_list[1].split(":")[1].upper()
+address = re.sub(r'[\w\.-]+@[\w\.-]+', '', address)    # Extract an email wrongly informed into this field
 print(str(text_list))
 try:
     match = re.findall(r'[\w\.-]+@[\w\.-]+', input_data['text'])    
@@ -76,7 +90,9 @@ phone = re.sub(r'[\D-]','',phone)
 # Get for TR PDF
 #
 tr_vehicle_owner = text_list[0].split(":")[1].strip().upper()
+tr_vehicle_owner = re.sub(r'[\r\n]+', '', tr_vehicle_owner) # Extract an newline character
 tr_vehicle_adress = address.split(",")[0].strip()
+tr_vehicle_adress = re.sub(r'[\w\.-]+@[\w\.-]+', '', tr_vehicle_adress)    # Extract an email wrongly informed into this field
 tr_vehicle_adress2 = ", ".join(address.split(",")[1:]).strip()
 tr_vehicle_adress2 = " ".join(tr_vehicle_adress2.split("\r\n")).strip()
 tr_vehicle_serial = str(text_list[8].split(":")[1]).upper()    
@@ -106,7 +122,9 @@ except:
 # Get for PDF
 #
 pdf_vehicle_owner = text_list[0].split(":")[1].strip().upper()
+pdf_vehicle_owner = re.sub(r'[\r\n]+', '', pdf_vehicle_owner) # Extract an newline character
 pdf_vehicle_adress = address.split(",")[0].strip()
+pdf_vehicle_adress = re.sub(r'[\w\.-]+@[\w\.-]+', '', pdf_vehicle_adress)    # Extract an email wrongly informed into this field
 pdf_vehicle_adress2 = ", ".join(address.split(",")[1:]).strip()
 pdf_vehicle_adress2 = " ".join(pdf_vehicle_adress2.split("\r\n")).strip()
 pdf_city =  pdf_vehicle_adress2.split(",")[0].strip()
@@ -164,31 +182,41 @@ else:
     pdf_ccs = "" # Leave this field blank
     
 # Send Autofilled PDF
-s1_title_request_pdf_asana = ["SQ5997142","SQ9575974","SQ4359210","SQ6193077","SQ3509691","SQ7202884","SQ9493879","SQ1624128","SQ9857937","SQ9579630","SQ6283166","SQ8910742"]
-s1_ut_vin_inspection_pdf_asana = ["SQ5548002","SQ2127240"]
-s1_vt_inspection_form_with_letterhead_pdf_asana = ["SQ8811460","SQ8403421","SQ1235346","SQ0550038","SQ0910340","SQ0559800","SQ3553182","SQ0355699","SQ0038404","SQ9197192","SQ2127240"]
-s2_vt_title_app = ["SQ8811460","SQ8403421","SQ1235346","SQ0550038","SQ0910340","SQ0559800","SQ3553182","SQ0355699","SQ0038404","SQ9197192","SQ0495127"]
-s2_vt_title_app_for_ut_transfer = ["SQ2127240"]
-s2_ut_title_app = ["SQ5548002","SQ2127240"]
-s2_sd_lien_cover_sheet = ["SQ5997142", "SQ9575974", "SQ4359210", "SQ6193077", "SQ3509691", "SQ7202884", "SQ9493879", "SQ1624128", "SQ9857937", "SQ9579630", "SQ6283166", "SQ8910742"]
+s1_title_request_pdf_asana = ["SQ5997142","SQ9575974","SQ4359210","SQ6193077","SQ3509691","SQ7202884","SQ9493879","SQ1624128","SQ9857937","SQ9579630","SQ6283166","SQ8910742","Custom"]
+s1_ut_vin_inspection_pdf_asana = ["SQ5548002","SQ2127240","Custom"]
+s1_vt_inspection_form_with_letterhead_pdf_asana = ["SQ8811460","SQ8403421","SQ1235346","SQ0550038","SQ0910340","SQ0559800","SQ3553182","SQ0355699","SQ0038404","SQ9197192","SQ2127240","SQ0804171","Custom"]
+s2_vt_title_app = ["SQ8811460","SQ8403421","SQ1235346","SQ0550038","SQ0910340","SQ0559800","SQ3553182","SQ0355699","SQ0038404","SQ9197192","SQ0495127","SQ0804171","Custom"]
+s2_vt_title_app_for_ut_transfer = ["SQ2127240","SQ8874800","SQ4051474","SQ3647371","Custom"]
+s2_ut_title_app = ["SQ5548002","SQ2127240","Custom","Custom"]
+s2_sd_lien_cover_sheet = ["SQ5997142", "SQ9575974", "SQ4359210", "SQ6193077", "SQ3509691", "SQ7202884", "SQ9493879", "SQ1624128", "SQ9857937", "SQ9579630", "SQ6283166", "SQ8910742","Custom"]
+s2_sd_automated_forms = ["SQ2712047", "SQ5199410", "SQ1055471", "SQ9782880", "SQ5166965", "SQ9493879", "SQ1624128", "SQ9857937", "SQ9579630", "SQ2649829", "SQ0804171", "SQ5736877", "SQ4922562", "SQ4808996", "SQ8069412", "SQ5023998", "SQ4359210", "SQ6193077", "SQ3509691", "SQ7202884", "SQ8874800", "SQ4051474", "SQ3647371", "SQ3325725", "SQ4635264", "SQ9575974", "SQ5357769", "SQ6671046", "SQ5997142","Custom"]
 
+try:
+    item_name = input_data['item_name']
+except:
+    item_name = ""
+    
 if input_data['sku'] in s1_title_request_pdf_asana:
     create_title_request(tr_lien_holder_name, tr_lien_holder_addres_1, tr_lien_holder_address_2, tr_day, tr_month, tr_year, tr_vehicle_year, tr_vehicle_make, tr_vehicle_serial, tr_vehicle_owner, tr_vehicle_adress, tr_vehicle_adress2, tr_account, input_data["wo"])  
 
-if input_data['sku'] in s1_ut_vin_inspection_pdf_asana:     
+if input_data['sku'] in s1_ut_vin_inspection_pdf_asana or item_name.find("Custom Street Legal Service") != -1:     
     create_ut_vin_inspection(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, input_data["wo"])
 
-if input_data['sku'] in s1_vt_inspection_form_with_letterhead_pdf_asana:     
+if  input_data['sku'] in s1_vt_inspection_form_with_letterhead_pdf_asana or item_name.find("Custom Street Legal Service") != -1:     
     create_vt_inspection_form_with_letterhead(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, pdf_mileage, input_data["wo"])       
     
-if input_data['sku'] in s2_vt_title_app:
+if  input_data['sku'] in s2_vt_title_app or item_name.find("Custom Street Legal Service") != -1:
     create_vt_title_app(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, pdf_city , pdf_state , pdf_zip , pdf_color, pdf_mileage, pdf_ccs, input_data["wo"], input_data["name"],  pdf_body_type, pdf_wheels)
 
-if input_data['sku'] in s2_vt_title_app_for_ut_transfer:
-    create_vt_title_app(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  "3169 E Atlantic Blvd #137",  "", "POMPANO BEACH" , "FL" , "33062" , pdf_color, pdf_mileage, pdf_ccs, input_data["wo"], input_data["name"],  pdf_body_type, pdf_wheels)
+if  input_data['sku'] in s2_vt_title_app_for_ut_transfer or item_name.find("Custom Street Legal Service") != -1:
+    create_vt_title_app_for_ut_transfer(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  "3169 E Atlantic Blvd #137",  "", "POMPANO BEACH" , "FL" , "33062" , pdf_color, pdf_mileage, pdf_ccs, input_data["wo"], input_data["name"],  pdf_body_type, pdf_wheels)
 
-if input_data['sku'] in s2_ut_title_app:
+if  input_data['sku'] in s2_ut_title_app or item_name.find("Custom Street Legal Service") != -1:
     create_ut_title_app(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, pdf_city , pdf_state , pdf_zip , pdf_color, pdf_mileage, pdf_ccs, input_data["wo"], input_data["name"]) 
 
 if input_data['sku'] in s2_sd_lien_cover_sheet:
     create_sd_lien_cover_sheet(tr_lien_holder_name, tr_vehicle_year, tr_vehicle_make,  tr_vehicle_model, tr_vehicle_serial, tr_vehicle_owner, tr_account, input_data["wo"])
+    
+if input_data['sku'] in s2_sd_automated_forms:
+    pass
+    #create_sd_automated_forms(pdf_vehicle_owner, pdf_vin, pdf_year,  pdf_make,  pdf_model,  pdf_vehicle_adress,  pdf_vehicle_adress2, pdf_city , pdf_state , pdf_zip , pdf_color, pdf_mileage, pdf_ccs, input_data["wo"], input_data["name"],  pdf_body_type, pdf_wheels)    

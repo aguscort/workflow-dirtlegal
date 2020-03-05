@@ -47,7 +47,7 @@ def getItems(offset = None):
 
 def getPhone(supplier):
     try:
-        if supplier.lower() == 'riva' or supplier.lower() == 'hardcabs':
+        if supplier.lower() == 'riva' or supplier.lower() == 'hardcabs' or supplier.lower() == 'morris':
             return "Phone: " + input_data['phone']
         else:
             return ''    

@@ -1,4 +1,5 @@
 import re
+from datetime import datetime
 
 # PARAMETERS 
 input_data = { 'order_id':	'',
@@ -94,7 +95,7 @@ date_long, date_short = date_treatment(input_data['orderDate'])
 # Order type = product if item name = ANYTHING ELSE
 # Order type = combo if at least one item is a service and the other isn't a service as listed above.
 
-serviceList = ['Dirt Bike Conversion','ATV Conversion' , 'UTV Conversion', 'Roxor Conversion', 'Military Conversion', 'Custom Street Legal Conversion', 'Golf Cart Conversion', 'Expedited Shipping Fee', 'Additional Fees For Registration/Parts/Shipping','Vehicle Registration Renewal']
+serviceList = ['Dirt Bike Conversion','ATV Conversion' , 'UTV Conversion', 'Roxor Conversion', 'Military Conversion', 'Custom Street Legal Conversion', 'Golf Cart Conversion', 'Expedited Shipping Fee', 'Additional Fees For Registration/Parts/Shipping','Vehicle Registration Renewal', 'Dirt Bike Street Legal Service']
 service = False
 product = False
 item = ''
@@ -143,29 +144,32 @@ for i in range(len(s1_title_request_pdf_asana)):
 #
 # Choosing the PDFS
 #    
-s1_instruction_pdf_asana = [['(1) SD Lien Instructions.pdf' , ['SQ5997142', 'SQ9575974', 'SQ4359210', 'SQ6193077', 'SQ3509691', 'SQ7202884', 'SQ9493879', 'SQ1624128', 'SQ9857937', 'SQ9579630', 'SQ6283166', 'SQ8910742']], \
-['(1) SD MCO Instructions.pdf' , ['SQ6671046','SQ4635264','SQ5166965','SQ2649829','SQ4922562','SQ4808996','SQ8069412','SQ5023998']], \
-['(1) SD Title Instructions.pdf' , ['SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
-['(1) UT Only Instructions.pdf' , ['SQ5548002']], \
-['(1) UT VT To UT Instructions.pdf' , ['SQ2127240']], \
-['(1) VT Instructions.pdf', ['SQ8811460', 'SQ8403421','SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699','SQ0038404','SQ9197192', 'SQ0495127']]]
-s1_checklist_pdf_asana = [['(1) CL SD Lien Tax.pdf', ['SQ5997142', 'SQ9575974', 'SQ4359210', 'SQ6193077',  'SQ3509691', 'SQ7202884','SQ9493879', 'SQ1624128','SQ9857937', 'SQ9579630', 'SQ6283166', 'SQ8910742']], \
-['(1) CL SD Lien.pdf', ['SQ5997142', 'SQ9575974', 'SQ4359210', 'SQ6193077',  'SQ3509691', 'SQ7202884','SQ9493879', 'SQ1624128','SQ9857937', 'SQ9579630', 'SQ6283166', 'SQ8910742']], \
-['(1) CL SD MCO or Title in Name Tax.pdf', ['SQ6671046', 'SQ4635264', 'SQ5166965', 'SQ2649829', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998','SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
-['(1) CL SD MCO.pdf', ['SQ6671046', 'SQ4635264', 'SQ5166965', 'SQ2649829', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998','SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
-['(1) CL SD Title in Name.pdf', ['SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
-['(1) CL SD Title Signed Over Tax.pdf', ['SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877']], \
-['(1) CL UT Only Tax.pdf', ['SQ5548002']], \
-['(1) CL UT Only.pdf', ['SQ5548002']] , \
-['(1) CL VT BOS VIN Inspection.pdf', ['SQ8811460', 'SQ8403421', 'SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699','SQ0038404','SQ9197192']],  \
-['(1) CL VT BOS.pdf', ['SQ8811460', 'SQ8403421', 'SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699','SQ0038404','SQ9197192']],  \
-['(1) CL VT MCO Tax.pdf', ['SQ8811460', 'SQ8403421', 'SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699','SQ0038404','SQ9197192']], \
-['(1) CL VT TO UT BOS BIZ TAX.pdf', ['SQ2127240']], \
-['(1) CL VT MCO.pdf', ['SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182']], \
-['(1) CL VT TO UT BOS BIZ.pdf', ['SQ2127240']], \
-['(1) CL VT TITLE SF97.pdf', ['SQ0495127']], \
-['(1) CL VT TITLE SF97 TAX.pdf', ['SQ0495127']], \
-['(1) CL VT TO UT BOS.pdf', ['SQ2127240']]]   
+s1_instruction_pdf_asana = [['(1) SD LIEN INSTRUCTIONS.pdf' , ['SQ5997142', 'SQ9575974', 'SQ4359210', 'SQ6193077', 'SQ3509691', 'SQ7202884', 'SQ9493879', 'SQ1624128', 'SQ9857937', 'SQ9579630', 'SQ6283166', 'SQ8910742','Custom']], \
+['(1) SD MCO INSTRUCTIONS.pdf' , ['SQ6671046','SQ4635264','SQ5166965','SQ2649829','SQ4922562','SQ4808996','SQ8069412','SQ5023998','Custom']], \
+['(1) SD TITLE INSTRUCTIONS.pdf' , ['SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877','Custom']], \
+['(1) UT ONLY INSTRUCTIONS.pdf' , ['SQ5548002','Custom']], \
+['(1) UT VT TO UT INSTRUCTIONS.pdf' , ['SQ2127240','Custom']], \
+['(1) VT INSTRUCTIONS.pdf', ['SQ8811460', 'SQ8403421','SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699','SQ9197192', 'SQ0495127', 'SQ0038404','Custom']]]
+s1_checklist_pdf_asana = [['(1) CL SD Lien Tax.pdf', ['SQ5997142', 'SQ9575974', 'SQ4359210', 'SQ6193077',  'SQ3509691', 'SQ7202884','SQ9493879', 'SQ1624128','SQ9857937', 'SQ9579630', 'SQ6283166', 'SQ8910742','Custom']], \
+['(1) CL SD Lien.pdf', ['SQ5997142', 'SQ9575974', 'SQ4359210', 'SQ6193077',  'SQ3509691', 'SQ7202884','SQ9493879', 'SQ1624128','SQ9857937', 'SQ9579630', 'SQ6283166', 'SQ8910742','Custom']], \
+['(1) CL SD MCO or Title in Name Tax.pdf', ['SQ6671046', 'SQ4635264', 'SQ5166965', 'SQ2649829', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998','SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877','Custom']], \
+['(1) CL SD MCO.pdf', ['SQ6671046', 'SQ4635264', 'SQ5166965', 'SQ2649829', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998','SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877','Custom']], \
+['(1) CL SD Title in Name.pdf', ['SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877','Custom']], \
+['(1) CL SD Title Signed Over Tax.pdf', ['SQ5357769', 'SQ3325725', 'SQ4922562', 'SQ4808996', 'SQ8069412', 'SQ5023998', 'SQ2712047', 'SQ5199410', 'SQ1055471', 'SQ9782880', 'SQ0804171', 'SQ5736877','Custom']], \
+['(1) CL UT Only Tax.pdf', ['SQ5548002','Custom']], \
+['(1) CL UT Only.pdf', ['SQ5548002','Custom']] , \
+['(1) CL VT BOS VIN Inspection.pdf', ['SQ8811460', 'SQ8403421', 'SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699','SQ9197192', 'SQ0038404','Custom']],  \
+['(1) CL VT BOS.pdf', ['SQ8811460', 'SQ8403421', 'SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699','Custom']],  \
+['(1) CL VT MCO Tax.pdf', ['SQ8811460', 'SQ8403421', 'SQ1235346', 'SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182', 'SQ0355699','Custom']], \
+['(1) CL VT TO UT BOS BIZ TAX.pdf', ['SQ2127240','Custom']], \
+['(1) CL VT MCO.pdf', ['SQ0550038', 'SQ0910340', 'SQ0559800', 'SQ3553182','Custom']], \
+['(1) CL VT TO UT BOS BIZ.pdf', ['SQ2127240','Custom']], \
+['(1) CL VT TITLE SF97.pdf', ['SQ0495127','Custom']], \
+['(1) CL VT TITLE SF97 TAX.pdf', ['SQ0495127','Custom']], \
+['(1) CL VT TO SD BOS.pdf', ['SQ8874800', 'SQ4051474', 'SQ3647371','Custom']], \
+['(1) CL VT TO SD BOS TAX.pdf', ['SQ8874800', 'SQ4051474', 'SQ3647371','Custom']], \
+['(1) VT TO SD INSTRUCTIONS.pdf', ['SQ8874800', 'SQ4051474', 'SQ3647371']], \
+['(1) CL VT TO UT BOS.pdf', ['SQ2127240','Custom']]]   
 pdfs_to_apply = []
 
 for i in range(len(s1_instruction_pdf_asana)):
@@ -178,6 +182,15 @@ for i in range(len(s1_checklist_pdf_asana)):
         if s1_checklist_pdf_asana[i][1][sku] in input_data['itemSKU']:
             pdfs_to_apply.append(s1_checklist_pdf_asana[i][0])                           
 
+#if input_data['item'].find("Custom Street Legal Conversion") != -1:
+#    for i in range(len(s1_instruction_pdf_asana)):
+#        if 'Custom' in s1_instruction_pdf_asana[i][1]:
+#            pdfs_to_apply.append(s1_instruction_pdf_asana[i][0])      
+#
+#    for i in range(len(s1_checklist_pdf_asana)):
+#        if 'Custom' in s1_checklist_pdf_asana[i][1]:
+#            pdfs_to_apply.append(s1_checklist_pdf_asana[i][0])                     
+                        
 print(str(pdfs_to_apply))     
 #
 # Setting up Conditions to create the Asana Task
