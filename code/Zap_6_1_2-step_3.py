@@ -4,16 +4,6 @@ import re, random
 import urllib.parse
 from datetime import datetime, timedelta
 
-# PARAMETERS 
-input_data = { 'item_name':	'',
-    'wo':	'',
-    'text':	'',
-    'name':'',
-    'sku': '',
-    'apikey_shipstation': '',
-    'password_shipstation': '' }
-# /PARAMETERS 
-
 orders_dict = {}
 customer_dict = {}
 attempts = int(input_data['attempts'])
@@ -34,7 +24,8 @@ def date_treatment():
     return datetoday, date_lastweek, datetoday_lastmonth
 
 def continue_process(attempts, name, text, wo):
-    url = 'https://hooks.zapier.com/hooks/catch/4834230/omn6opx/'
+    pass
+    url = 'https://hooks.zapier.com/hooks/catch/4834230/o96pk0p/'
     print("continue_process")
     data = {"attempts" : attempts, "name" : name,   "text" : text, "wo" : wo}
     return requests.post(url, data=json.dumps(data),)
@@ -46,11 +37,14 @@ def get_tasks():
 
 def update_description(gid, text):
     url = 'https://app.asana.com/api/1.0/tasks/' +  str(gid)  + "?opt_fields=html_notes"
-    #headers = {"Content-Type" :"application/json", "Authorization": "Bearer0/b8024a8ee666abda2c08db438001492b"}
-    headers = {"Content-Type" :"application/json", "Authorization": "Bearer0/825342430bedc4e0cbcc701c8f59fd96"}
+    headers = {"Content-Type" :"application/json", "Authorization": "Bearer0/b8024a8ee666abda2c08db438001492b"}
+    #headers = {"Content-Type" :"application/json", "Authorization": "Bearer0/825342430bedc4e0cbcc701c8f59fd96"}
     req = requests.get(url, headers=headers,).json()    
-    prev_desc = req["data"]["html_notes"].split("</body>")[0]
-    if prev_desc.find("Renewal") == -1:
+    try:
+        prev_desc = req["data"]["html_notes"].split("</body>")[0]
+    except:
+        prev_desc = ""
+    if prev_desc.find("Renewal") == -1 and len(prev_desc) > 0 :
         #print(prev_desc)
         data = {"data" : {"html_notes": prev_desc + "\n<b>" + text  + "</b></body>"}}
         return requests.put(url, data=json.dumps(data), headers=headers,).json()   
@@ -59,8 +53,8 @@ def update_description(gid, text):
 
 def add_story(gid, text):
     url = 'https://app.asana.com/api/1.0/tasks/' +  str(gid) + '/stories'
-    #headers = {"Content-Type" :"application/json", "Authorization": "Bearer0/b8024a8ee666abda2c08db438001492b"}
-    headers = {"Content-Type" :"application/json", "Authorization": "Bearer0/825342430bedc4e0cbcc701c8f59fd96"}
+    headers = {"Content-Type" :"application/json", "Authorization": "Bearer0/b8024a8ee666abda2c08db438001492b"}
+    #headers = {"Content-Type" :"application/json", "Authorization": "Bearer0/825342430bedc4e0cbcc701c8f59fd96"}
     data = {"data" : {"text": text, "is_pinned" : True}}
     return requests.post(url, data=json.dumps(data), headers=headers,).json()
 
@@ -138,8 +132,11 @@ order_item_name = []
 count = 0
 text_list = str(input_data['text']).split("\r\n\r\n")
 name = text_list[0].split(":")[1].strip()
-address = text_list[1].split(":")[1].upper()
+address = text_list[3].split(":")[1].upper()
 address = re.sub(r'[\w\.-]+@[\w\.-]+', '', address)    # Extract an email wrongly informed into this field
+if text_list[1].split(":")[1].find("No") != -1:
+    second_owner = text_list[2].split(":")[1].strip().upper()
+    relationship = text_list[1].split(":")[1].strip()
 #print(str(text_list))
 try:
     match = re.findall(r'[\w\.-]+@[\w\.-]+', input_data['text'])    
@@ -149,14 +146,14 @@ except:
 #print(str(email))    
 phone = input_data['text'].split("Phone:")[1].split("Email:")[0]
 phone = re.sub(r'[\D-]','',phone)
-phone_short = phone[-4:]
-taxes_paid  = text_list[18].split(":")[1].strip()
+phone_short = phone[-6:]
+taxes_paid  = text_list[20].split(":")[1].strip()
 try:
-    taxes_amount = str(text_list[19].split(":")[1].strip())
+    taxes_amount = str(text_list[21].split(":")[1].strip())
 except:
     taxes_amount = ""
 try:
-    lien_holder_name = text_list[14].split(":")[1].strip()
+    lien_holder_name = text_list[16].split(":")[1].strip()
 except:
     lien_holder_name = ""
 #
@@ -164,22 +161,25 @@ except:
 #
 pfd_vehicle_owner = text_list[0].split(":")[1].strip().upper()
 pfd_vehicle_owner = re.sub(r'\r\n', '', pfd_vehicle_owner) # Extract an newline character
+if text_list[1].split(":")[1].find("No") != -1:
+    pfd_second_owner = text_list[2].split(":")[1].strip().upper()
+    pfd_relationship = text_list[1].split(":")[1].strip()
 pfd_vehicle_adress = address.split(",")[0].strip()
 pfd_vehicle_adress = re.sub(r'[\w\.-]+@[\w\.-]+', '', pfd_vehicle_adress)    # Extract an email wrongly informed into this field
 pfd_vehicle_adress2 = ", ".join(address.split(",")[1:]).strip()
 pfd_vehicle_adress2 = " ".join(pfd_vehicle_adress2.split("\r\n")).strip()
 pfd_vehicle_adress2 = re.sub(r'[\w\.-]+@[\w\.-]+', '', pfd_vehicle_adress2)    # Extract an email wrongly informed into this field
-pdf_vin = str(text_list[8].split(":")[1]).upper()    
+pdf_vin = str(text_list[10].split(":")[1]).upper()    
 try:
-    pdf_year =  text_list[4].split(":")[1]  
+    pdf_year =  text_list[6].split(":")[1]  
 except:
     pdf_year =  ""
 try:
-    pdf_make =  text_list[5].split(":")[1]   
+    pdf_make =  text_list[7].split(":")[1]   
 except:    
     pdf_make =  ""
 try:
-    pdf_model =  text_list[6].split(":")[1] 
+    pdf_model =  text_list[8].split(":")[1] 
 except:    
     pdf_model = ""
 #
@@ -188,9 +188,15 @@ except:
 formatted_text = ""
 # Name
 formatted_text += text_list[0].split(":")[1].strip().upper() + "\r\n\r\n"
+# Second Owner
+if text_list[1].split(":")[1].find("No") != -1:
+    if text_list[1].split(":")[1].find("OR") != -1:
+        formatted_text += "OR " + text_list[2].split(":")[1].strip().upper() + "\r\n\r\n"
+    elif text_list[1].split(":")[1].find("AND") != -1:        
+        formatted_text += "AND " + text_list[2].split(":")[1].strip().upper() + "\r\n\r\n"
 # Address
 formatted_text += re.sub('[^a-zA-Z0-9 ]', '', address.split(",")[0]).strip() + "\r\n" +  re.sub('[^a-zA-Z0-9 ]', '', " ".join(address.split(",")[1:])).strip() + "\r\n\r\n" #+  re.sub('[^a-zA-Z0-9 ]', '', address.split(" ")[-1].strip())  + "\r\n\r\n"
-count = 2
+count = 4
 # Number
 formatted_text += text_list[count].split(":")[1].strip() + "\r\n\r\n"
 count += 1
@@ -207,21 +213,27 @@ while (text_list[count].find("Disclaimer") == -1) and (count+3 <= len(text_list)
     else:
         formatted_text +=  text_list[count].strip() + "\r\n\r\n"
     count += 1
-formatted_text += str("\r\n\r\n").join(text_list[count+1:-1])
-#print(formatted_text)
+#formatted_text += str("\r\n\r\n").join(text_list[count+1:-2])
+#formatted_text += str("\r\n\r\n").join(text_list[count-2:-1]).replace("\r\n\r\n"," ")
+count += 1    
+while (text_list[count].find("Questions ") == -1) and (count+3 <= len(text_list)):    
+    formatted_text +=  text_list[count].strip() + "\r\n\r\n"    
+    count +=1         
+formatted_text += str("").join(text_list[count:-1:]).replace("\r\n\r\n"," ")
+print(formatted_text)
 #
 # Look for Order
 #
+task_gid = ""
 target_order  = []
 is_Order = False
 order_id = ""
 customers = exhaustive_customer_search()
 for customer in customers:
     try:
-        customer_dict.update({ re.sub(r'[\D-]','',customer['phone'])[-4:]: customer['name']})    
+        customer_dict.update({ re.sub(r'[\D-]','',customer['phone'])[-6:]: customer['name']})    
     except:
         pass
-    
     try:
         if customer['email'].lower() == email.lower():
             name = customer['name']        
@@ -239,28 +251,34 @@ for customer in customers:
                             if item['sku'] in skus_for_lien_holder:
                                 add_lien_holder_name = True                            
                     if is_Order:
-                        target_order = order
+                        target_order = order                      
                         # Create Comment in Asana Task
                         for task in get_tasks()["data"]:                            
                             if task["resource_type"] == "task" and str(task["name"]).find(str(target_order["orderNumber"])) != -1:
+                                task_gid =  str(task['gid'])                                 
                                 #Add Lien Holder Name
-                                if add_lien_holder_name: 
-                                    comment =  lien_holder_name + '\n<b>' 
-                                else:
-                                    comment =  ''
+                                #if add_lien_holder_name: 
+                                 #   comment =  lien_holder_name + '\n<b>' 
+                                #else:
+                                 #   comment =  ''
                                 #Add taxes                                
-                                if taxes_paid == "Yes":
-                                    update_description(str(task['gid']), "TAX PAID: $" + str(taxes_amount))
-                                else:
-                                    update_description(str(task['gid']), "TAX OWED: $")
-                                print(str(task['gid']))
-                                add_story(str(task['gid']), formatted_text )
+                                #if taxes_paid == "Yes":
+                                 #   update_description(str(task['gid']), "TAX PAID: $" + str(taxes_amount))
+                                #else:
+                                 #   update_description(str(task['gid']), "TAX OWED: $")
+                                #print(str(task['gid']))
+                                #add_story(str(task['gid']), formatted_text )
+                                print("Order found from customer's name: " + target_order['orderNumber'].strip())
                                 break                        
-                        break
-            print("Order found from customer's name: " + target_order['orderNumber'].strip())
-            output = { "folder_name" : "Automated POA #" + get_order_number(target_order['orderNumber'].strip()), "text" : formatted_text, "pfd_vehicle_owner" : pfd_vehicle_owner, "pfd_vehicle_adress" : pfd_vehicle_adress, "pfd_vehicle_adress2" : pfd_vehicle_adress2, "pdf_vin" : pdf_vin, "pdf_year" : pdf_year, "pdf_make" : pdf_make, "pdf_model" : pdf_model, "wait" : str(random.randint(1, 5)), "wo" : get_order_number(target_order['orderNumber'].strip()), "order_sku" : order_sku, "order_item_name" : order_item_name,  "customer_name" : name, "order_id" : order_id}
+                        #break                                
     except:
-        output = { "folder_name" : "None"}      
+        pass
+
+                        
+if is_Order:
+    output = { "folder_name" : "Automated POA #" + get_order_number(target_order['orderNumber'].strip()), "text" : formatted_text, "pfd_vehicle_owner" : pfd_vehicle_owner, "pfd_vehicle_adress" : pfd_vehicle_adress, "pfd_vehicle_adress2" : pfd_vehicle_adress2, "pdf_vin" : pdf_vin, "pdf_year" : pdf_year, "pdf_make" : pdf_make, "pdf_model" : pdf_model, "wait" : str(random.randint(1, 5)), "wo" :  get_order_number(target_order['orderNumber'].strip()), "order_sku" : order_sku, "order_item_name" : order_item_name,  "customer_name" : name, "order_id" : order_id}
+else:
+    output = { "folder_name" : "None"}      
 
 try:        
     if not is_Order and customer_dict[str(phone_short)] is not None:
@@ -282,12 +300,13 @@ try:
                     # Create Comment in Asana Task
                     for task in get_tasks()["data"]:
                         if task["resource_type"] == "task" and task["name"].find(target_order["orderNumber"]) != -1:
-                            if taxes_paid == "Yes":
-                                update_description(str(task['gid']), "TAX PAID: $" + str(taxes_amount))
-                            else:
-                                update_description(str(task['gid']), "TAX OWED: $")
-                            print(str(task['gid']))                                
-                            add_story(task['gid'], formatted_text )
+                            task_gid =  str(task['gid'])
+                            #if taxes_paid == "Yes":
+                            #   update_description(str(task['gid']), "TAX PAID: $" + str(taxes_amount))
+                            #else:
+                            #   update_description(str(task['gid']), "TAX OWED: $")
+                            # print(str(task['gid']))                                
+                            #add_story(task['gid'], formatted_text )
                             break    
                     break                  
             output = {"folder_name" : "Automated POA #" + get_order_number(target_order['orderNumber'].strip()), "text" : formatted_text, "pfd_vehicle_owner" : pfd_vehicle_owner, "pfd_vehicle_adress" : pfd_vehicle_adress, "pfd_vehicle_adress2" : pfd_vehicle_adress2, "pdf_vin" : pdf_vin, "pdf_year" : pdf_year, "pdf_make" : pdf_make, "pdf_model" : pdf_model, "wait" : str(random.randint(1, 5)), "wo" : target_order['orderNumber'].strip(), "order_sku" : order_sku, "order_item_name" : order_item_name, "customer_name" : name, "order_id" : order_id}    
@@ -306,7 +325,21 @@ if is_Order:
                 #create_folder(input_data["root"].strip() + "/" + output["folder_name"].strip())
                 pass
         except:
-            pass
+            pass     
+    ###
+    # Move the comment code at the end in order to avoid several launches
+    #
+    #Add Lien Holder Name
+    if add_lien_holder_name: 
+        comment =  lien_holder_name + '\n<b>' 
+    else:
+        comment =  ''
+    #Add taxes
+    if taxes_paid == "Yes":
+        update_description(str(task_gid), "TAX PAID: $" + str(taxes_amount))
+    else:
+        update_description(str(task_gid), "TAX OWED: $")
+    add_story(str(task_gid), formatted_text )           
 else:
     if attempts < 10:   
         attempts += 1
